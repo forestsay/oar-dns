@@ -130,7 +130,11 @@ func (dnsSrv *dnsServer) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 				Hdr: dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
 				A:   net.ParseIP(result.address),
 			})
+		} else {
+			msg.Rcode = dns.RcodeNameError
 		}
+	default:
+		msg.Rcode = dns.RcodeNameError
 	}
 	_ = w.WriteMsg(&msg)
 }
