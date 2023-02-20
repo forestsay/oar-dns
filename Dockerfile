@@ -1,4 +1,4 @@
-FROM golang:1.18.0-alpine3.14 AS builder
+FROM docker.io/golang:1.18.0-alpine3.14 AS builder
 
 RUN apk fix
 RUN apk --no-cache --update upgrade && \
@@ -26,7 +26,7 @@ RUN ls
 WORKDIR /data/app/oar/bin
 RUN ls
 
-FROM alpine:3.14.4
+FROM docker.io/alpine:3.14.4
 RUN mkdir -p /data/app/oar
 WORKDIR /data/app/oar
 
