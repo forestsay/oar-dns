@@ -3,8 +3,7 @@ package ovpn
 import (
 	"bufio"
 	"fmt"
-	"github.com/forestsay/oar-dns/util"
-	"log"
+	"github.com/forestsay/oar-dns/log"
 	"net"
 	"os"
 	"strings"
@@ -18,9 +17,10 @@ type ClientRecord struct {
 }
 
 type ManagementClient struct {
-    EndPoint string
+	EndPoint string
+	Password string
 
-    routeMap sync.Map
+	routeMap sync.Map
 }
 
 func (m *ManagementClient) clientReader(conn net.Conn) {
@@ -34,13 +34,13 @@ func (m *ManagementClient) clientReader(conn net.Conn) {
 func (m *ManagementClient) onReceiveMessage(message string) {
 	if strings.HasPrefix(message, "ROUTING_TABLE") {
 		arr := strings.Split(message, "\t")
-		log.Println("Added:", arr[2], arr[1])
+		log.Logger.Info("Added: " + arr[2] + " " + arr[1])
 		m.routeMap.Store(arr[2], ClientRecord{arr[1], time.Now()})
 	}
 }
 
 func (m *ManagementClient) clientWriter(conn net.Conn) {
-	_, err := fmt.Fprintf(conn, util.GetEnvVar("OPENVPN-MANAGEMENT-INTERFACE-PASSWORD", "password")+"\r\n")
+	_, err := fmt.Fprintf(conn, m.Password+"\r\n")
 	if err != nil {
 		os.Exit(3)
 	}
@@ -103,7 +103,7 @@ func (m *ManagementClient) GuessDomain(domain string) (result ClientRecord, ok b
 func (m *ManagementClient) StartOpenVPNClient() {
 	c, err := net.Dial("tcp", m.EndPoint)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Logger.Panic(err)
 		return
 	}
 

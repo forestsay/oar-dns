@@ -16,6 +16,7 @@ func main() {
 
 	omc := &ovpn.ManagementClient{
 		EndPoint: util.GetEnvVar("OPENVPN-MANAGEMENT-INTERFACE-ENDPOINT", "127.0.0.1:27273"),
+		Password: util.GetEnvVar("OPENVPN-MANAGEMENT-INTERFACE-PASSWORD", "password"),
 	}
 	omc.StartOpenVPNClient()
 

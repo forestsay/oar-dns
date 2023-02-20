@@ -3,9 +3,9 @@ package dns
 import (
 	"fmt"
 	"github.com/apolloconfig/agollo/v4"
+	"github.com/forestsay/oar-dns/log"
 	"github.com/forestsay/oar-dns/ovpn"
 	"github.com/miekg/dns"
-	"log"
 	"net"
 	"strings"
 	"time"
@@ -50,11 +50,13 @@ func (d *Server) resolveDomain(domain string) (result string, ok bool) {
 	apolloResult, ok := d.resolveFromApollo("A", domain)
 	if ok {
 		result = apolloResult
+		return
 	}
 
 	ovpnResult, ok := d.resolveARecordFromOVPN(domain)
 	if ok {
 		result = ovpnResult.Address
+		return
 	}
 
 	return "", false
@@ -98,6 +100,6 @@ func (d *ServerConfig) StartDNSServer() {
 		Apollo:                  d.Apollo,
 	}
 	if err := srv.ListenAndServe(); err != nil {
-		log.Fatalf("Failed to set udp listener %s\n", err.Error())
+		log.Logger.Panicf("Failed to set udp listener %s\n", err)
 	}
 }
